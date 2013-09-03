@@ -155,6 +155,36 @@ class EActiveRecordRelationBehaviorTest extends \CTestCase
 	}
 
 	/**
+	 * Tests the transaction getter and setter
+	 */
+	public function testGetSetTransaction()
+	{
+		$EActiveRecordRelationBehavior = new \EActiveRecordRelationBehavior();
+		$EActiveRecordRelationBehavior->setTransaction(\Yii::app()->db->beginTransaction());
+		$this->assertInstanceOf( 'CDbTransaction', $this->getPrivateProperty($EActiveRecordRelationBehavior, '_transaction') );
+	
+		$this->assertInstanceOf( 'CDbTransaction', $EActiveRecordRelationBehavior->getTransaction() );
+	}
+
+	/**
+	 * getPrivateProperty
+	 *
+	 * Uses reflection to allow for the returning of private properties
+	 *
+	 * @param (Object) (my_obj) the class that contains the private property
+	 * @param (String) (property_name) name of the property whose value to return
+	 *
+	 * @return (Mixed) value of the private property
+	 */ 
+	public function getPrivateProperty($my_obj, $property_name)
+	{
+		$reflectionClass = new \ReflectionClass(get_class($my_obj));
+		$reflectionProperty = $reflectionClass->getProperty($property_name);
+		$reflectionProperty->setAccessible(true);
+		return $reflectionProperty->getValue($my_obj);
+	}
+
+	/**
 	 * test creation of AR and assigning a relation with BELONGS_TO
 	 *
 	 * @dataProvider fkConfigurationProvider

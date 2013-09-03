@@ -56,6 +56,24 @@ class EActiveRecordRelationBehavior extends CActiveRecordBehavior
 	}
 
 	/**
+	 * Getter _transaction
+	 * @return object CDbTransaction the transaction object
+	 */
+	public function getTransaction()
+	{
+		return $this->_transaction;
+	}
+
+	/**
+	 * Setter for _transaction
+	 * @param $transaction CDbTransaction the transaction object
+	 */
+	public function setTransaction(CDbTransaction $transaction)
+	{
+		$this->_transaction = $transaction;
+	}
+
+	/**
 	 * Responds to {@link CModel::onBeforeValidate} event.
 	 * @throws CDbException
 	 * @param CModelEvent $event event parameter
@@ -93,7 +111,7 @@ class EActiveRecordRelationBehavior extends CActiveRecordBehavior
 	{
 		// ensure transactions
 		if ($this->useTransaction && $this->owner->dbConnection->currentTransaction===null)
-			$this->_transaction=$this->owner->dbConnection->beginTransaction();
+			$this->setTransaction($this->owner->dbConnection->beginTransaction());
 
 		foreach($this->owner->relations() as $name => $relation)
 		{
@@ -229,13 +247,13 @@ class EActiveRecordRelationBehavior extends CActiveRecordBehavior
 				}
 			}
 			// commit internal transaction if one exists
-			if ($this->_transaction!==null)
-				$this->_transaction->commit();
+			if ($this->getTransaction()!==null)
+				$this->getTransaction()->commit();
 
 		} catch(Exception $e) {
 			// roll back internal transaction if one exists
-			if ($this->_transaction!==null)
-				$this->_transaction->rollback();
+			if ($this->getTransaction()!==null)
+				$this->getTransaction()->rollback();
 			// re-throw exception
 			throw $e;
 		}
